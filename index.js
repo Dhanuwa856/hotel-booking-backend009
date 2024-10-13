@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import userRouter from "./routes/userRoutes.js";
 import jwt from "jsonwebtoken";
 import galleryRouter from "./routes/galleryRoutes.js";
+import categoryRouter from "./routes/categoryRoutes.js";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ mongoose
 
 app.use("/api/users/", userRouter);
 app.use("/api/gallery/", galleryRouter);
+app.use("/api/categories/", categoryRouter);
 
 app.listen(5000, (req, res) => {
   console.log("Sever is runing on the port 5000");

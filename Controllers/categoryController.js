@@ -1,12 +1,14 @@
 import Category from "../models/category.js";
 
-// crate a new category
+// Create a new category
 
 export const crateCategory = async (req, res) => {
   const user = req.user;
 
   if (user == null) {
-    res.status(403).json({ message: "Please Loging" });
+    res.status(403).json({
+      message: "Please Loging",
+    });
     return;
   }
   if (user?.type != "admin") {
@@ -15,7 +17,6 @@ export const crateCategory = async (req, res) => {
     });
     return;
   }
-
   const newCategory = new Category(req.body);
   newCategory
     .save()
@@ -26,12 +27,15 @@ export const crateCategory = async (req, res) => {
       });
     })
     .catch((err) => {
-      res.json({ message: "Category creation failed", error: err });
+      res.json({
+        message: "Category creation failed",
+        error: err,
+      });
     });
 };
 
 // Get all categorys
-export const getcategory = async (req, res) => {
+export const getCategory = async (req, res) => {
   try {
     const category = await Category.find();
     res.status(200).json(category);
