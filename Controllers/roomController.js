@@ -60,3 +60,39 @@ export const getRoomByNumber = async (req, res) => {
       .json({ message: "Failed to fetch room details", error: error.message });
   }
 };
+
+// Update room (Admin only)
+export const updateRoom = async (req, res) => {
+  const user = req.user;
+
+  if (!user || user?.type !== "admin") {
+    return res
+      .status(403)
+      .json({ message: "You do not have permission to update room details" });
+  }
+
+  const { roomNumber } = req.params;
+  const updatedData = req.body;
+
+  try {
+    const updatedRoom = await Room.findOneAndUpdate(
+      { roomNumber },
+      updatedData,
+      { new: true }
+    );
+
+    if (!updatedRoom) {
+      return res
+        .status(404)
+        .json({ message: `Room '${roomNumber}' not found` });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Room updated successfully", room: updatedRoom });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to update room", error: error.message });
+  }
+};
