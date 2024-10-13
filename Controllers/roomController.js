@@ -65,7 +65,12 @@ export const getRoomByNumber = async (req, res) => {
 export const updateRoom = async (req, res) => {
   const user = req.user;
 
-  if (!user || user?.type !== "admin") {
+  // Check if the user is logged in and is an admin
+  if (!user) {
+    return res.status(403).json({ message: "Please Login" });
+  }
+
+  if (user.type !== "admin") {
     return res
       .status(403)
       .json({ message: "You do not have permission to update room details" });
@@ -81,6 +86,7 @@ export const updateRoom = async (req, res) => {
       { new: true }
     );
 
+    // Check if the room was found
     if (!updatedRoom) {
       return res
         .status(404)
