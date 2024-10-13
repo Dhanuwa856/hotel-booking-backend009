@@ -41,3 +41,22 @@ export const getAllRooms = async (req, res) => {
       .json({ message: "Failed to fetch rooms", error: err.message });
   }
 };
+
+// Get room by room number (Public access)
+export const getRoomByNumber = async (req, res) => {
+  const roomNumber = req.params.roomNumber;
+
+  try {
+    const room = await Room.findOne({ roomNumber });
+    if (!room) {
+      return res
+        .status(404)
+        .json({ message: `Room '${roomNumber}' not found` });
+    }
+    res.status(200).json(room);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch room details", error: error.message });
+  }
+};
