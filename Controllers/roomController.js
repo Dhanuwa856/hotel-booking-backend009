@@ -102,3 +102,41 @@ export const updateRoom = async (req, res) => {
       .json({ message: "Failed to update room", error: error.message });
   }
 };
+
+export const deleteRoom = async (req, res) => {
+  const user = req.user;
+
+  // Check if the user is logged in
+  if (!user) {
+    return res.status(403).json({ message: "Please Login" });
+  }
+
+  // Check if the user is an admin
+  if (user.type !== "admin") {
+    return res
+      .status(403)
+      .json({ message: "You do not have permission to delete room details" });
+  }
+
+  const { roomNumber } = req.params;
+
+  try {
+    const deletedRoom = await Room.findOneAndDelete({ roomNumber });
+
+    // Check if the room was found and deleted
+    if (!deletedRoom) {
+      return res
+        .status(404)
+        .json({ message: `Room '${roomNumber}' not found` });
+    }
+
+    res
+      .status(200)
+      .json({ message: `Room '${roomNumber}' deleted successfully` });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to delete room", error: error.message });
+  }
+};
+fu;
