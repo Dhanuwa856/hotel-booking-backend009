@@ -1,7 +1,6 @@
 import Category from "../models/category.js";
 
 // Create a new category
-
 export const crateCategory = async (req, res) => {
   const user = req.user;
 
