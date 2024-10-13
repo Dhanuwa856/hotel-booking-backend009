@@ -90,7 +90,11 @@ export const getCategoryByName = async (req, res) => {
   const categoryName = req.params.name;
 
   try {
-    const category = await Category.findOne({ name: categoryName });
+    // Find the category by name, case-insensitive
+
+    const category = await Category.findOne({
+      name: new RegExp("^" + categoryName + "$", "i"),
+    });
 
     if (!category) {
       return res
