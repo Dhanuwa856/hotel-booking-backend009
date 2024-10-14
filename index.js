@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import galleryRouter from "./routes/galleryRoutes.js";
 import categoryRouter from "./routes/categoryRoutes.js";
 import roomRouter from "./routes/roomRoutes.js";
+import bookingRouter from "./routes/bookingRoutes.js";
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use("/api/users/", userRouter);
 app.use("/api/gallery/", galleryRouter);
 app.use("/api/categories/", categoryRouter);
 app.use("/api/rooms/", roomRouter);
+app.use("/api/booking/", bookingRouter);
 
 app.listen(5000, (req, res) => {
   console.log("Sever is runing on the port 5000");

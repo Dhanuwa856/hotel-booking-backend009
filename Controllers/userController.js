@@ -108,3 +108,21 @@ export const checkAdmin = (req, res, next) => {
 
   next(); // Proceed if the user is an admin
 };
+// Middleware to check if the user is an customer
+export const checkCustomer = (req, res, next) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(403).json({
+      message: "Please Login",
+    });
+  }
+
+  if (user?.type !== "customer") {
+    return res.status(403).json({
+      message: "You do not have permission to perform this action",
+    });
+  }
+
+  next(); // Proceed if the user is an customer
+};
