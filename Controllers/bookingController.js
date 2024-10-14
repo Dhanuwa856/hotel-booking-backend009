@@ -93,3 +93,17 @@ export const getBookingsByEmail = async (req, res) => {
     });
   }
 };
+
+export const getAllBookings = async (req, res) => {
+  try {
+    // Retrieve all bookings from the database
+    const bookings = await Booking.find();
+
+    // Send the bookings as a response
+    res.status(200).json(bookings);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to retrieve bookings", error: error.message });
+  }
+};
