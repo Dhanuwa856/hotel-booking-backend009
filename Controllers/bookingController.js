@@ -4,11 +4,6 @@ import Room from "../models/room.js";
 export const createBooking = async (req, res) => {
   const user = req.user;
 
-  // Ensure the user is logged in
-  if (!user) {
-    return res.status(403).json({ message: "Please Login" });
-  }
-
   const { room_id, checkInDate, checkOutDate, guests, reason, notes } =
     req.body;
 
@@ -66,6 +61,34 @@ export const createBooking = async (req, res) => {
     console.error("Error creating booking:", error); // Log error for debugging
     res.status(500).json({
       message: "Failed to create booking",
+      error: error.message,
+    });
+  }
+};
+
+export const getBookingsByEmail = async (req, res) => {
+  const user = req.user;
+
+  try {
+    // Find all bookings related to the user's email
+    const bookings = await Booking.find({ email: user.email });
+
+    // Check if the user has any bookings
+    if (bookings.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No bookings found for this email." });
+    }
+
+    // Respond with the list of bookings
+    res.status(200).json({
+      message: "Bookings retrieved successfully",
+      bookings,
+    });
+  } catch (error) {
+    console.error("Error retrieving bookings:", error); // Log error for debugging
+    res.status(500).json({
+      message: "Failed to retrieve bookings",
       error: error.message,
     });
   }
