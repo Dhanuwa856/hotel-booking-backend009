@@ -155,3 +155,37 @@ export const cancelBooking = async (req, res) => {
       .json({ message: "Failed to cancel booking", error: error.message });
   }
 };
+
+export const updateBooking = async (req, res) => {
+  const { booking_id } = req.params; // Get booking_id from the request parameters
+  const updatedData = req.body; // Get the data to update from the request body
+
+  try {
+    // Find the booking by booking_id
+    const booking = await Booking.findOne({ booking_id });
+
+    // Check if the booking exists
+    if (!booking) {
+      return res
+        .status(404)
+        .json({ message: `Booking with ID '${booking_id}' not found.` });
+    }
+
+    // Update the booking details
+    const updatedBooking = await Booking.findOneAndUpdate(
+      { booking_id },
+      updatedData,
+      { new: true } // Return the updated document
+    );
+
+    res.status(200).json({
+      message: "Booking updated successfully",
+      booking: updatedBooking,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to update booking",
+      error: error.message,
+    });
+  }
+};

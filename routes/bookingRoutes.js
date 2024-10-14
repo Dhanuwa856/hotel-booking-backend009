@@ -9,6 +9,7 @@ import {
   createBooking,
   getAllBookings,
   getBookingsByEmail,
+  updateBooking,
 } from "../Controllers/bookingController.js";
 
 const bookingRouter = express.Router();
@@ -22,5 +23,10 @@ bookingRouter.put(
   checkCustomer,
   cancelBooking
 );
-
+bookingRouter.put(
+  "/change/:booking_id/",
+  checkLoggedIn,
+  checkAdmin,
+  updateBooking
+);
 export default bookingRouter;
