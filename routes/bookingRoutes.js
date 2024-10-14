@@ -5,6 +5,7 @@ import {
   checkLoggedIn,
 } from "../Controllers/userController.js";
 import {
+  cancelBooking,
   createBooking,
   getAllBookings,
   getBookingsByEmail,
@@ -15,5 +16,11 @@ const bookingRouter = express.Router();
 bookingRouter.post("/", checkLoggedIn, checkCustomer, createBooking);
 bookingRouter.get("/", checkLoggedIn, checkCustomer, getBookingsByEmail);
 bookingRouter.get("/all", checkLoggedIn, checkAdmin, getAllBookings);
+bookingRouter.put(
+  "/cancel/:bookingId/",
+  checkLoggedIn,
+  checkCustomer,
+  cancelBooking
+);
 
 export default bookingRouter;

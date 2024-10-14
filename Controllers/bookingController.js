@@ -8,40 +8,53 @@ export const createBooking = async (req, res) => {
     req.body;
 
   try {
-    // Validate if the room exists
+    // Validate if room exists
     const room = await Room.findOne({ roomNumber: room_id });
     if (!room) {
       return res.status(404).json({ message: `Room '${room_id}' not found` });
     }
 
-    // Check if the room is already booked for the specified dates
+    // Check for existing bookings with the same email and room that are not cancelled
     const existingBooking = await Booking.findOne({
       room_id,
+      email: user.email,
+      status: { $ne: "cancelled" }, // Ensure it is not cancelled
       $or: [
         {
-          checkInDate: { $lte: checkOutDate, $gte: checkInDate }, // Overlap check
+          checkInDate: { $gte: checkInDate, $lt: checkOutDate }, // Overlaps with new booking
         },
         {
-          checkOutDate: { $gte: checkInDate, $lte: checkOutDate }, // Overlap check
+          checkOutDate: { $gt: checkInDate, $lte: checkOutDate }, // Overlaps with new booking
+        },
+        {
+          checkInDate: { $gte: checkInDate, $lte: checkOutDate }, // Overlaps with new booking
+          checkOutDate: { $gte: checkInDate, $lte: checkOutDate }, // Overlaps with new booking
         },
       ],
     });
 
     if (existingBooking) {
-      return res
-        .status(400)
-        .json({ message: "Room is already booked for the selected dates." });
+      return res.status(400).json({
+        message: `You already have a booking for this room during the selected dates.`,
+      });
     }
 
-    // Generate unique booking_id starting from 2003
+    // Check for any canceled bookings for the same room and email
+    const canceledBooking = await Booking.findOne({
+      room_id,
+      email: user.email,
+      status: "cancelled", // Check for cancelled bookings
+    });
+
+    // Generate unique booking_id
     const lastBooking = await Booking.findOne().sort({ booking_id: -1 });
-    const booking_id = lastBooking ? lastBooking.booking_id + 1 : 2003;
+    const booking_id = lastBooking ? lastBooking.booking_id + 1 : 2003; // Start from 2003
 
     // Create new booking
     const newBooking = new Booking({
       booking_id,
       room_id,
-      email: user.email, // Automatically assign the logged-in user's email
+      email: user.email, // Auto-assign the email of the logged-in user
       checkInDate,
       checkOutDate,
       guests,
@@ -49,16 +62,14 @@ export const createBooking = async (req, res) => {
       notes,
     });
 
-    // Save the new booking
+    // Save the booking
     await newBooking.save();
 
-    // Respond with success
     res.status(201).json({
       message: "Booking created successfully",
       booking: newBooking,
     });
   } catch (error) {
-    console.error("Error creating booking:", error); // Log error for debugging
     res.status(500).json({
       message: "Failed to create booking",
       error: error.message,
@@ -105,5 +116,42 @@ export const getAllBookings = async (req, res) => {
     res
       .status(500)
       .json({ message: "Failed to retrieve bookings", error: error.message });
+  }
+};
+
+export const cancelBooking = async (req, res) => {
+  const user = req.user;
+  const { bookingId } = req.params; // Get booking ID from URL
+
+  try {
+    // Find the booking by ID
+    const booking = await Booking.findOne({ booking_id: bookingId });
+
+    // Check if the booking exists
+    if (!booking) {
+      return res
+        .status(404)
+        .json({ message: `Booking ID '${bookingId}' not found` });
+    }
+
+    // Check if the booking belongs to the logged-in user
+    if (booking.email !== user.email) {
+      return res
+        .status(403)
+        .json({ message: "You do not have permission to cancel this booking" });
+    }
+
+    // Update the booking status to "cancelled"
+    booking.status = "cancelled"; // Set status to cancelled
+    await booking.save(); // Save the updated booking
+
+    res.status(200).json({
+      message: `Booking ID '${bookingId}' has been cancelled successfully`,
+      booking,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to cancel booking", error: error.message });
   }
 };
