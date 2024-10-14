@@ -108,4 +108,3 @@ export const checkAdmin = (req, res, next) => {
 
   next(); // Proceed if the user is an admin
 };
-fun;
