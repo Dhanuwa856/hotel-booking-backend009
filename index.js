@@ -44,7 +44,7 @@ mongoose
 app.use("/api/users/", userRouter);
 app.use("/api/gallery/", galleryRouter);
 app.use("/api/categories/", categoryRouter);
-app.use("/api/room/", roomRouter);
+app.use("/api/rooms/", roomRouter);
 
 app.listen(5000, (req, res) => {
   console.log("Sever is runing on the port 5000");

@@ -102,7 +102,7 @@ export const updateRoom = async (req, res) => {
       .json({ message: "Failed to update room", error: error.message });
   }
 };
-
+// delete room (Admin only)
 export const deleteRoom = async (req, res) => {
   const user = req.user;
 
@@ -139,4 +139,3 @@ export const deleteRoom = async (req, res) => {
       .json({ message: "Failed to delete room", error: error.message });
   }
 };
-fu;
