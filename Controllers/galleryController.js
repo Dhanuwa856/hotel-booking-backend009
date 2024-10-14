@@ -2,24 +2,10 @@ import GalleryItem from "../models/gallery.js";
 
 // Create a new gallery item
 export const createGalleryItem = async (req, res) => {
-  const user = req.user;
-
-  if (user == null) {
-    res.status(403).json({
-      message: "Please Loging",
-    });
-    return;
-  }
-  if (user?.type != "admin") {
-    res.status(403).json({
-      message: "You do not have permission to crate a gallery item",
-    });
-    return;
-  }
-  const { name, image, description } = req.body.item;
+  const { name, images, description } = req.body;
 
   try {
-    const newGalleryItem = new GalleryItem({ name, image, description });
+    const newGalleryItem = new GalleryItem({ name, images, description });
     await newGalleryItem.save();
     res.status(201).json(newGalleryItem);
   } catch (error) {

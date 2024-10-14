@@ -2,17 +2,6 @@ import Room from "../models/room.js";
 
 // Create a new room (Admin only)
 export const createRoom = async (req, res) => {
-  const user = req.user;
-  // Check if the user is logged in
-  if (!user) {
-    return res.status(403).json({ message: "Please Login" });
-  }
-  // Check if the user is an admin
-  if (user?.type !== "admin") {
-    return res
-      .status(403)
-      .json({ message: "You do not have permission to create a room" });
-  }
   const newRoom = new Room(req.body);
   newRoom
     .save()
@@ -63,19 +52,6 @@ export const getRoomByNumber = async (req, res) => {
 
 // Update room (Admin only)
 export const updateRoom = async (req, res) => {
-  const user = req.user;
-
-  // Check if the user is logged in and is an admin
-  if (!user) {
-    return res.status(403).json({ message: "Please Login" });
-  }
-
-  if (user.type !== "admin") {
-    return res
-      .status(403)
-      .json({ message: "You do not have permission to update room details" });
-  }
-
   const { roomNumber } = req.params;
   const updatedData = req.body;
 
@@ -104,20 +80,6 @@ export const updateRoom = async (req, res) => {
 };
 // delete room (Admin only)
 export const deleteRoom = async (req, res) => {
-  const user = req.user;
-
-  // Check if the user is logged in
-  if (!user) {
-    return res.status(403).json({ message: "Please Login" });
-  }
-
-  // Check if the user is an admin
-  if (user.type !== "admin") {
-    return res
-      .status(403)
-      .json({ message: "You do not have permission to delete room details" });
-  }
-
   const { roomNumber } = req.params;
 
   try {

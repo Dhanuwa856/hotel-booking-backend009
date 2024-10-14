@@ -5,12 +5,13 @@ import {
   getCategory,
   getCategoryByName,
 } from "../Controllers/categoryController.js";
+import { checkAdmin, checkLoggedIn } from "../Controllers/userController.js";
 
 const categoryRouter = express.Router();
 
 categoryRouter.get("/", getCategory);
-categoryRouter.post("/", crateCategory);
-categoryRouter.delete("/:name", deleteCategory);
+categoryRouter.post("/", checkLoggedIn, checkAdmin, crateCategory);
+categoryRouter.delete("/:name", checkLoggedIn, checkAdmin, deleteCategory);
 categoryRouter.get("/:name", getCategoryByName);
 
 export default categoryRouter;

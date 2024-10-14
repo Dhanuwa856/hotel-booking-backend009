@@ -76,3 +76,36 @@ export async function loginUser(req, res) {
     res.status(500).json({ message: "Server error while logging in" });
   }
 }
+
+// Middleware to check if the user is logged in
+export const checkLoggedIn = (req, res, next) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(403).json({
+      message: "Please Login",
+    });
+  }
+
+  next(); // Proceed to the next middleware or controller function
+};
+
+// Middleware to check if the user is an admin
+export const checkAdmin = (req, res, next) => {
+  const user = req.user;
+
+  if (!user) {
+    return res.status(403).json({
+      message: "Please Login",
+    });
+  }
+
+  if (user?.type !== "admin") {
+    return res.status(403).json({
+      message: "You do not have permission to perform this action",
+    });
+  }
+
+  next(); // Proceed if the user is an admin
+};
+fun;

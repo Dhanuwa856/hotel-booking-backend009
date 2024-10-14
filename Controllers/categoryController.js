@@ -2,20 +2,6 @@ import Category from "../models/category.js";
 
 // Create a new category
 export const crateCategory = async (req, res) => {
-  const user = req.user;
-
-  if (user == null) {
-    res.status(403).json({
-      message: "Please Loging",
-    });
-    return;
-  }
-  if (user?.type != "admin") {
-    res.status(403).json({
-      message: "You do not have permission to crate a category",
-    });
-    return;
-  }
   const newCategory = new Category(req.body);
   newCategory
     .save()
@@ -45,20 +31,6 @@ export const getCategory = async (req, res) => {
 
 // Delete a category by name (Admin only)
 export const deleteCategory = async (req, res) => {
-  const user = req.user;
-
-  // Check if user is logged in
-  if (user == null) {
-    return res.status(403).json({ message: "Please Login" });
-  }
-
-  // Check if user is an admin
-  if (user?.type !== "admin") {
-    return res.status(403).json({
-      message: "You do not have permission to delete a category",
-    });
-  }
-
   const categoryName = req.params.name;
 
   try {
