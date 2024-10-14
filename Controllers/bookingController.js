@@ -4,6 +4,13 @@ import Room from "../models/room.js";
 export const createBooking = async (req, res) => {
   const user = req.user;
 
+  // Check if the user is disabled
+  if (user.disabled) {
+    return res.status(403).json({
+      message: "Your account has been disabled. You cannot make bookings.",
+    });
+  }
+
   const { room_id, checkInDate, checkOutDate, guests, reason, notes } =
     req.body;
 
@@ -39,13 +46,6 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Check for any canceled bookings for the same room and email
-    const canceledBooking = await Booking.findOne({
-      room_id,
-      email: user.email,
-      status: "cancelled", // Check for cancelled bookings
-    });
-
     // Generate unique booking_id
     const lastBooking = await Booking.findOne().sort({ booking_id: -1 });
     const booking_id = lastBooking ? lastBooking.booking_id + 1 : 2003; // Start from 2003
@@ -60,6 +60,7 @@ export const createBooking = async (req, res) => {
       guests,
       reason,
       notes,
+      status: "pending", // Default status when creating a new booking
     });
 
     // Save the booking

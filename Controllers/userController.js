@@ -59,6 +59,7 @@ export async function loginUser(req, res) {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      disabled: user.disabled,
       type: user.type,
     };
 
@@ -125,4 +126,34 @@ export const checkCustomer = (req, res, next) => {
   }
 
   next(); // Proceed if the user is an customer
+};
+
+export const blockUser = async (req, res) => {
+  const { email } = req.params; // Get user email from request parameters
+
+  try {
+    // Find the user by email
+    const userToBlock = await User.findOne({ email });
+
+    // Check if the user exists
+    if (!userToBlock) {
+      return res
+        .status(404)
+        .json({ message: `User with email '${email}' not found.` });
+    }
+
+    // Update the user's disabled status to true
+    userToBlock.disabled = true;
+    await userToBlock.save();
+
+    res.status(200).json({
+      message: `User with email '${email}' has been blocked successfully.`,
+      user: userToBlock,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to block user",
+      error: error.message,
+    });
+  }
 };
