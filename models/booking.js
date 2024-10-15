@@ -7,7 +7,7 @@ const bookingSchema = new mongoose.Schema({
     unique: true, // Ensures the booking ID is unique
   },
   room_id: {
-    type: Number,
+    type: String,
     required: true,
   },
   email: {
