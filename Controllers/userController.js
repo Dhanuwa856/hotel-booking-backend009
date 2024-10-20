@@ -157,3 +157,86 @@ export const blockUser = async (req, res) => {
     });
   }
 };
+
+// Function to send verification email
+// const sendVerificationEmail = async (user) => {
+//   const verificationToken = crypto.randomBytes(32).toString("hex");
+//   user.verificationToken = verificationToken;
+//   user.verificationTokenExpires = Date.now() + 3600000; // 1-hour expiration
+//   await user.save();
+
+//   const transporter = nodemailer.createTransport({
+//     service: "gmail", // or any other email service
+//     auth: {
+//       user: process.env.EMAIL,
+//       pass: process.env.PASSWORD,
+//     },
+//   });
+
+//   const mailOptions = {
+//     from: process.env.EMAIL,
+//     to: user.email,
+//     subject: "Email Verification",
+//     text: `Please verify your email by clicking this link:
+//            http://yourdomain.com/verify-email?token=${verificationToken}`,
+//   };
+
+//   return transporter.sendMail(mailOptions);
+// };
+
+// Signup function
+// export const signupUser = async (req, res) => {
+//   const { email, password, firstName, lastName, whatsApp, phone } = req.body;
+
+//   try {
+//     const user = new User({
+//       email,
+//       password, // Ensure to hash the password before saving
+//       firstName,
+//       lastName,
+//       whatsApp,
+//       phone,
+//     });
+
+//     await user.save();
+//     await sendVerificationEmail(user);
+
+//     res.status(201).json({
+//       message: "User created successfully. Please verify your email.",
+//       user,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "User signup failed",
+//       error: error.message,
+//     });
+//   }
+// };
+
+// Email verification function
+// export const verifyEmail = async (req, res) => {
+//   const token = req.query.token;
+
+//   try {
+//     const user = await User.findOne({
+//       verificationToken: token,
+//       verificationTokenExpires: { $gt: Date.now() }, // Check if token is still valid
+//     });
+
+//     if (!user) {
+//       return res.status(400).json({ message: "Invalid or expired token" });
+//     }
+
+//     user.emailVerified = true;
+//     user.verificationToken = undefined; // Clear the token
+//     user.verificationTokenExpires = undefined; // Clear expiration
+//     await user.save();
+
+//     res.status(200).json({ message: "Email verified successfully" });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Failed to verify email",
+//       error: error.message,
+//     });
+//   }
+// };

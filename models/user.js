@@ -41,6 +41,14 @@ const userSchema = mongoose.Schema({
     required: true,
     default: false,
   },
+  verificationToken: {
+    type: String,
+    required: false, // Not required by default
+  },
+  verificationTokenExpires: {
+    type: Date,
+    required: false, // Not required by default
+  },
 });
 
 const User = mongoose.model("User009", userSchema);
