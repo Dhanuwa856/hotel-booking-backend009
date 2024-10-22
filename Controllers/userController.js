@@ -2,6 +2,7 @@ import argon2 from "argon2";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import Booking from "../models/booking.js";
 
 // Create User
 
@@ -177,4 +178,34 @@ export const checkEmailVerified = (req, res, next) => {
   }
 
   next(); // Proceed if the user's email is verified
+};
+
+export const getAdminStats = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments({});
+    const totalBookings = await Booking.countDocuments({});
+    const confirmedBookings = await Booking.countDocuments({
+      status: "confirmed",
+    });
+    const pendingBookings = await Booking.countDocuments({ status: "pending" });
+
+    const confirmedPercentage = (
+      (confirmedBookings / totalBookings) *
+      100
+    ).toFixed(2);
+    const pendingPercentage = ((pendingBookings / totalBookings) * 100).toFixed(
+      2
+    );
+
+    res.status(200).json({
+      totalUsers,
+      totalBookings,
+      confirmedBookings,
+      pendingBookings,
+      confirmedPercentage,
+      pendingPercentage,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };

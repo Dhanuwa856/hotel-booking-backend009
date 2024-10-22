@@ -23,8 +23,8 @@ bookingRouter.post(
   createBooking
 );
 bookingRouter.get("/", checkLoggedIn, checkCustomer, getBookingsByEmail);
-bookingRouter.get("/all", getAllBookings);
-// bookingRouter.get("/all", checkLoggedIn, checkAdmin, getAllBookings);
+// bookingRouter.get("/all", getAllBookings);
+bookingRouter.get("/all", checkLoggedIn, checkAdmin, getAllBookings);
 bookingRouter.put(
   "/cancel/:bookingId/",
   checkLoggedIn,
