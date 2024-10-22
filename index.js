@@ -9,10 +9,12 @@ import categoryRouter from "./routes/categoryRoutes.js";
 import roomRouter from "./routes/roomRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
 import feedbackRouter from "./routes/feedbackRoutes.js";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
+app.use(cors()); // Enable CORS
 app.use(bodyParser.json());
 
 const connectionString = process.env.MONGO_URL;

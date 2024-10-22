@@ -16,7 +16,8 @@ const bookingRouter = express.Router();
 
 bookingRouter.post("/", checkLoggedIn, checkCustomer, createBooking);
 bookingRouter.get("/", checkLoggedIn, checkCustomer, getBookingsByEmail);
-bookingRouter.get("/all", checkLoggedIn, checkAdmin, getAllBookings);
+bookingRouter.get("/all", getAllBookings);
+// bookingRouter.get("/all", checkLoggedIn, checkAdmin, getAllBookings); 
 bookingRouter.put(
   "/cancel/:bookingId/",
   checkLoggedIn,
