@@ -2,6 +2,7 @@ import express from "express";
 import {
   checkAdmin,
   checkCustomer,
+  checkEmailVerified,
   checkLoggedIn,
 } from "../Controllers/userController.js";
 import {
@@ -13,7 +14,13 @@ import {
 
 const feedbackRouter = express.Router();
 
-feedbackRouter.post("/", checkLoggedIn, checkCustomer, createFeedback);
+feedbackRouter.post(
+  "/",
+  checkLoggedIn,
+  checkCustomer,
+  checkEmailVerified,
+  createFeedback
+);
 feedbackRouter.get("/", checkLoggedIn, checkCustomer, getFeedbackByUser);
 feedbackRouter.get("/all", checkLoggedIn, checkAdmin, getAllFeedback);
 feedbackRouter.put(
