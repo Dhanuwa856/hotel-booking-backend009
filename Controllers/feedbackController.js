@@ -88,11 +88,9 @@ export const updateFeedbackStatus = async (req, res) => {
       feedback,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Failed to update feedback status",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Failed to update feedback status",
+      error: error.message,
+    });
   }
 };

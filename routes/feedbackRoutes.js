@@ -22,7 +22,8 @@ feedbackRouter.post(
   createFeedback
 );
 feedbackRouter.get("/", checkLoggedIn, checkCustomer, getFeedbackByUser);
-feedbackRouter.get("/all", checkLoggedIn, checkAdmin, getAllFeedback);
+// feedbackRouter.get("/all", checkLoggedIn, checkAdmin, getAllFeedback); // real code
+feedbackRouter.get("/all", getAllFeedback); //test
 feedbackRouter.put(
   "/:feedback_id",
   checkLoggedIn,
