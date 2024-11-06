@@ -12,8 +12,8 @@ import {
 const userRouter = express.Router();
 
 userRouter.post("/", createUser);
-userRouter.get("/", getUsers);
-userRouter.get("/stats", getAdminStats);
+userRouter.get("/", checkLoggedIn, checkAdmin, getUsers);
+userRouter.get("/stats", checkLoggedIn, checkAdmin, getAdminStats);
 userRouter.post("/login", loginUser);
 userRouter.put("/block/:email", checkLoggedIn, checkAdmin, blockUser);
 

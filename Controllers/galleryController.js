@@ -22,3 +22,26 @@ export const getGalleryItems = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+export const deleteGalleryItem = async (req, res) => {
+  const galleryId = req.params.id;
+
+  try {
+    const deletedGalleryItem = await GalleryItem.findByIdAndDelete({
+      _id: galleryId,
+    });
+
+    if (!deleteGalleryItem) {
+      return res.status(404).json({ message: "Gallery Item not found" });
+    }
+    res.status(200).json({
+      message: "Gallery Item deleted successfully",
+      result: deletedGalleryItem,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Gallery Item deletion failed",
+      error: err.message,
+    });
+  }
+};

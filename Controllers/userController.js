@@ -63,6 +63,7 @@ export async function loginUser(req, res) {
       disabled: user.disabled,
       type: user.type,
       emailVerified: user.emailVerified,
+      image: user.image,
     };
 
     // Generate JWT token
