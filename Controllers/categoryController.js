@@ -80,3 +80,29 @@ export const getCategoryByName = async (req, res) => {
     });
   }
 };
+
+export const updateCategoryByName = async (req, res) => {
+  const categoryName = req.params.name;
+  const updatedData = req.body;
+
+  try {
+    const updatedCategory = await Category.findOneAndUpdate(
+      { name: categoryName },
+      updatedData,
+      { new: true }
+    );
+
+    // Check if the category was found
+    if (!updatedCategory) {
+      return res.status(404).json({ message: `'${categoryName}' not found` });
+    }
+    res.status(200).json({
+      message: "Category updated successfully",
+      category: updatedCategory,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to update Category", error: err.message });
+  }
+};
