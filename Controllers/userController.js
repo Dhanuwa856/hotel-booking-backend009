@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import Booking from "../models/booking.js";
 
 // Create User
-
 export async function createUser(req, res) {
   const user = req.body;
   const password = req.body.password;
@@ -58,6 +57,7 @@ export async function loginUser(req, res) {
     const payload = {
       id: user._id,
       email: user.email,
+      phone: user.phone,
       firstName: user.firstName,
       lastName: user.lastName,
       disabled: user.disabled,
@@ -208,5 +208,29 @@ export const getAdminStats = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+// Customer Info change
+
+export const updateUser = async (req, res) => {
+  const userEmail = req.params.userEmail;
+  const updatedData = req.body;
+
+  try {
+    const updatedUserInfo = await User.findOneAndUpdate(
+      { email: userEmail },
+      updatedData,
+      { new: true }
+    );
+    // check if the email was found
+    if (!updatedUserInfo) {
+      return res.status(404).json({ message: `${userEmail} Not Found` });
+    }
+    res.status(200).json({ message: "User Info Updated Successfully" });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to update user info", error: err.message });
   }
 };

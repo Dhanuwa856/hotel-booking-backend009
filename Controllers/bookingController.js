@@ -55,6 +55,7 @@ export const createBooking = async (req, res) => {
       booking_id,
       room_id,
       email: user.email, // Auto-assign the email of the logged-in user
+      phone: user.phone,
       checkInDate,
       checkOutDate,
       guests,
