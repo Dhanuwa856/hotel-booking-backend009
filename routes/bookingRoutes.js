@@ -8,6 +8,7 @@ import {
 import {
   cancelBooking,
   createBooking,
+  createBookingUsingCategory,
   getAllBookings,
   getBookingsByEmail,
   updateBooking,
@@ -37,4 +38,11 @@ bookingRouter.put(
   checkAdmin,
   updateBooking
 );
+bookingRouter.post(
+  "/search-rooms",
+  checkLoggedIn,
+  checkCustomer,
+  createBookingUsingCategory
+);
+
 export default bookingRouter;

@@ -191,3 +191,60 @@ export const updateBooking = async (req, res) => {
     });
   }
 };
+
+export const createBookingUsingCategory = async (req, res) => {
+  try {
+    const start = new Date(req.body.checkInDate);
+    const end = new Date(req.body.checkOutDate);
+    const category = req.body.category;
+
+    if (!start || !end || !category) {
+      return res
+        .status(400)
+        .json({ message: "Please provide all required fields." });
+    }
+
+    if (start >= end) {
+      return res
+        .status(400)
+        .json({ message: "Check-out date must be after check-in date." });
+    }
+
+    // Step 1: Find bookings that overlap with the specified date range
+    const overlappingBookings = await Booking.find({
+      status: "confirmed",
+      $or: [
+        { checkInDate: { $gte: start, $lt: end } },
+        { checkOutDate: { $gt: start, $lte: end } },
+      ],
+    });
+
+    // Step 2: Extract room IDs of booked rooms from the overlapping bookings
+    const bookedRoomIds = overlappingBookings.map((booking) => booking.room_id);
+
+    // Step 3: Query rooms that are not in the bookedRoomIds and match the category
+    const availableRooms = await Room.find({
+      roomNumber: { $nin: bookedRoomIds },
+      category: category,
+    });
+
+    // Step 4: Return available rooms
+    if (availableRooms.length > 0) {
+      res.status(200).json({
+        message: "Available rooms found.",
+        data: availableRooms,
+      });
+    } else {
+      res.status(200).json({
+        message: "No rooms available for the selected dates and criteria.",
+        data: [],
+      });
+    }
+  } catch (error) {
+    console.error("Error in creating booking using category:", error);
+    res.status(500).json({
+      message: "An error occurred while searching for available rooms.",
+      error: error.message,
+    });
+  }
+};
