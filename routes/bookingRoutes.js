@@ -20,7 +20,7 @@ bookingRouter.post(
   "/",
   checkLoggedIn,
   checkCustomer,
-  checkEmailVerified,
+  // checkEmailVerified,
   createBooking
 );
 bookingRouter.get("/", checkLoggedIn, checkCustomer, getBookingsByEmail);
@@ -29,7 +29,7 @@ bookingRouter.put(
   "/cancel/:bookingId/",
   checkLoggedIn,
   checkCustomer,
-  checkEmailVerified,
+  // checkEmailVerified,
   cancelBooking
 );
 bookingRouter.put(

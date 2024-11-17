@@ -18,50 +18,58 @@ export const createBooking = async (req, res) => {
     // Validate if room exists
     const room = await Room.findOne({ roomNumber: room_id });
     if (!room) {
-      return res.status(404).json({ message: `Room '${room_id}' not found` });
+      return res.status(404).json({ message: `Room '${room_id}' not found.` });
     }
 
-    // Check for existing bookings with the same email and room that are not cancelled
+    // Check if the room is available
+    if (!room.isAvailable) {
+      return res.status(400).json({
+        message:
+          "This room is currently unavailable. Please choose a different room.",
+      });
+    }
+
+    // Check for existing bookings with the same room that are not cancelled
     const existingBooking = await Booking.findOne({
       room_id,
-      email: user.email,
-      status: { $ne: "cancelled" }, // Ensure it is not cancelled
+      status: { $ne: "cancelled" },
       $or: [
         {
-          checkInDate: { $gte: checkInDate, $lt: checkOutDate }, // Overlaps with new booking
+          checkInDate: { $gte: checkInDate, $lt: checkOutDate },
         },
         {
-          checkOutDate: { $gt: checkInDate, $lte: checkOutDate }, // Overlaps with new booking
+          checkOutDate: { $gt: checkInDate, $lte: checkOutDate },
         },
         {
-          checkInDate: { $gte: checkInDate, $lte: checkOutDate }, // Overlaps with new booking
-          checkOutDate: { $gte: checkInDate, $lte: checkOutDate }, // Overlaps with new booking
+          checkInDate: { $gte: checkInDate, $lte: checkOutDate },
+          checkOutDate: { $gte: checkInDate, $lte: checkOutDate },
         },
       ],
     });
 
     if (existingBooking) {
       return res.status(400).json({
-        message: `You already have a booking for this room during the selected dates.`,
+        message:
+          "This room is already booked during the selected dates. Please choose different dates or another room.",
       });
     }
 
     // Generate unique booking_id
     const lastBooking = await Booking.findOne().sort({ booking_id: -1 });
-    const booking_id = lastBooking ? lastBooking.booking_id + 1 : 2003; // Start from 2003
+    const booking_id = lastBooking ? lastBooking.booking_id + 1 : 2003;
 
     // Create new booking
     const newBooking = new Booking({
       booking_id,
       room_id,
-      email: user.email, // Auto-assign the email of the logged-in user
+      email: user.email,
       phone: user.phone,
       checkInDate,
       checkOutDate,
       guests,
       reason,
       notes,
-      status: "pending", // Default status when creating a new booking
+      status: "pending",
     });
 
     // Save the booking
@@ -73,7 +81,7 @@ export const createBooking = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: "Failed to create booking",
+      message: "Failed to create booking. Please try again later.",
       error: error.message,
     });
   }
