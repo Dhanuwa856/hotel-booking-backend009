@@ -4,6 +4,7 @@ import {
   checkCustomer,
   checkEmailVerified,
   checkLoggedIn,
+  verifyUserStatus,
 } from "../Controllers/userController.js";
 import {
   cancelBooking,
@@ -20,6 +21,7 @@ bookingRouter.post(
   "/",
   checkLoggedIn,
   checkCustomer,
+  verifyUserStatus,
   // checkEmailVerified,
   createBooking
 );
@@ -29,6 +31,7 @@ bookingRouter.put(
   "/cancel/:bookingId/",
   checkLoggedIn,
   checkCustomer,
+  verifyUserStatus,
   // checkEmailVerified,
   cancelBooking
 );

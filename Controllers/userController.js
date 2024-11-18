@@ -234,3 +234,35 @@ export const updateUser = async (req, res) => {
       .json({ message: "Failed to update user info", error: err.message });
   }
 };
+
+export const verifyUserStatus = async (req, res, next) => {
+  const user = req.user; // Assuming `req.user` is set with the user from the token.
+  const userEmail = user.email;
+
+  try {
+    // Fetch the latest user data from the database using the email
+    const userStatus = await User.findOne({ email: userEmail });
+
+    // If the user is not found, return an error
+    if (!userStatus) {
+      return res.status(404).json({
+        message: "User not found.",
+      });
+    }
+
+    // If the user is disabled, block the action
+    if (userStatus.disabled) {
+      return res.status(403).json({
+        message: "Your account has been disabled. You cannot make bookings.",
+      });
+    }
+
+    // User is active, continue to the next middleware or route handler
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to verify user status",
+      error: error.message,
+    });
+  }
+};
