@@ -205,8 +205,12 @@ export const createBookingUsingCategory = async (req, res) => {
     const start = new Date(req.body.checkInDate);
     const end = new Date(req.body.checkOutDate);
     const category = req.body.category;
+    const guests = req.body.guests;
+    const email = req.user?.email; // Use optional chaining to avoid crashes
+    const phone = req.user?.phone;
 
-    if (!start || !end || !category) {
+    // Validate required fields
+    if (!start || !end || !category || !guests) {
       return res
         .status(400)
         .json({ message: "Please provide all required fields." });
@@ -220,7 +224,7 @@ export const createBookingUsingCategory = async (req, res) => {
 
     // Step 1: Find bookings that overlap with the specified date range
     const overlappingBookings = await Booking.find({
-      status: "confirmed",
+      status: { $in: ["confirmed", "pending"] }, // Include both confirmed and pending bookings
       $or: [
         { checkInDate: { $gte: start, $lt: end } },
         { checkOutDate: { $gt: start, $lte: end } },
@@ -236,21 +240,39 @@ export const createBookingUsingCategory = async (req, res) => {
       category: category,
     });
 
-    // Step 4: Return available rooms
+    // Step 4: Handle available rooms
     if (availableRooms.length > 0) {
-      res.status(200).json({
-        message: "Available rooms found.",
-        data: availableRooms,
+      const selectedRoom = availableRooms[0]; // Select the top available room
+
+      // Generate unique booking_id
+      const lastBooking = await Booking.findOne().sort({ booking_id: -1 });
+      const booking_id = lastBooking ? lastBooking.booking_id + 1 : 2003;
+
+      // Create a new booking with the selected room
+      const newBooking = await Booking.create({
+        booking_id,
+        room_id: selectedRoom.roomNumber,
+        checkInDate: start,
+        checkOutDate: end,
+        guests: guests,
+        email: email,
+        phone: phone,
+        timeStamp: new Date(),
+      });
+
+      return res.status(200).json({
+        message: "Booking created successfully with the available room.",
+        data: newBooking,
       });
     } else {
-      res.status(200).json({
+      // No available rooms found
+      return res.status(404).json({
         message: "No rooms available for the selected dates and criteria.",
-        data: [],
       });
     }
   } catch (error) {
     console.error("Error in creating booking using category:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "An error occurred while searching for available rooms.",
       error: error.message,
     });

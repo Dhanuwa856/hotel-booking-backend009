@@ -42,9 +42,10 @@ bookingRouter.put(
   updateBooking
 );
 bookingRouter.post(
-  "/search-rooms",
+  "/quick-booking",
   checkLoggedIn,
   checkCustomer,
+  verifyUserStatus,
   createBookingUsingCategory
 );
 
