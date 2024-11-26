@@ -3,17 +3,78 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import Booking from "../models/booking.js";
+import { sendEmail } from "./emailService.js";
 
 // Create User
+// export async function createUser(req, res) {
+//   const user = req.body;
+//   const password = req.body.password;
+
+//   try {
+//     const passwordHash = await argon2.hash(password);
+//     user.password = passwordHash;
+
+//     // Generate a 6-digit verification token
+//     const verificationToken = Math.floor(
+//       100000 + Math.random() * 900000
+//     ).toString();
+
+//     // Set the token expiration to 10 minutes from now
+//     const verificationTokenExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes in milliseconds
+
+//     // Add verification fields to the user object
+//     user.verificationToken = verificationToken;
+//     user.verificationTokenExpires = verificationTokenExpires;
+
+//     const newUser = await new User(user).save();
+//     res.status(201).json(newUser);
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// }
+
 export async function createUser(req, res) {
   const user = req.body;
   const password = req.body.password;
 
   try {
+    // Hash the password
     const passwordHash = await argon2.hash(password);
     user.password = passwordHash;
+
+    // Generate a 6-digit verification token
+    const verificationToken = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
+    // Set the token expiration to 10 minutes from now
+    const verificationTokenExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes in milliseconds
+
+    // Add verification fields to the user object
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpires = verificationTokenExpires;
+
+    // Save the user to the database
     const newUser = await new User(user).save();
-    res.status(201).json(newUser);
+
+    // Send the OTP via email
+    await sendEmail(
+      newUser.email,
+      "Email Verification - Hotel Name",
+      `Hi ${newUser.firstName},\n\nThank you for signing up! Please verify your email address to activate your account.\n\nYour OTP (One-Time Password) is: ${verificationToken}\n\nThis OTP is valid for 10 minutes. If you did not request this, please ignore this email.\n\nBest regards,\nHotel Name Team`
+    );
+
+    // Send a response (omit sensitive information like password)
+    res.status(201).json({
+      message: "User created successfully! Please verify your email.",
+      user: {
+        email: newUser.email,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        type: newUser.type,
+        emailVerified: newUser.emailVerified,
+      },
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

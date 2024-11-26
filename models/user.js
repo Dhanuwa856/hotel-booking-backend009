@@ -46,10 +46,12 @@ const userSchema = mongoose.Schema({
     required: true,
     default: false,
   },
-  verificationToken: {
-    type: String,
-    required: false, // Not required by default
-  },
+  verificationToken: [
+    {
+      type: Number,
+      required: false, // Not required by default
+    },
+  ],
   verificationTokenExpires: {
     type: Date,
     required: false, // Not required by default
