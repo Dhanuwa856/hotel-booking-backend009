@@ -47,8 +47,8 @@ export async function createUser(req, res) {
       100000 + Math.random() * 900000
     ).toString();
 
-    // Set the token expiration to 10 minutes from now
-    const verificationTokenExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes in milliseconds
+    // Set the token expiration to 60 minutes from now
+    const verificationTokenExpires = new Date(Date.now() + 60 * 60 * 1000); // 60 minutes in milliseconds
 
     // Add verification fields to the user object
     user.verificationToken = verificationToken;
@@ -61,7 +61,7 @@ export async function createUser(req, res) {
     await sendEmail(
       newUser.email,
       "Email Verification - Hotel Name",
-      `Hi ${newUser.firstName},\n\nThank you for signing up! Please verify your email address to activate your account.\n\nYour OTP (One-Time Password) is: ${verificationToken}\n\nThis OTP is valid for 10 minutes. If you did not request this, please ignore this email.\n\nBest regards,\nHotel Name Team`
+      `Hi ${newUser.firstName},\n\nThank you for signing up! Please verify your email address to activate your account.\n\nYour OTP (One-Time Password) is: ${verificationToken}\n\nThis OTP is valid for 60 minutes. If you did not request this, please ignore this email.\n\nBest regards,\nHotel Name Team`
     );
 
     // Send a response (omit sensitive information like password)
@@ -327,3 +327,30 @@ export const verifyUserStatus = async (req, res, next) => {
     });
   }
 };
+
+export async function verifyEmail(req, res) {
+  const { email, token } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.emailVerified) {
+      return res.status(400).json({ message: "Email already verified" });
+    }
+
+    if (user.verificationToken !== token) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Mark the email as verified
+    user.emailVerified = true;
+    user.verificationToken = null; // Clear token
+    user.verificationTokenExpires = null; // Clear expiry
+    await user.save();
+
+    res.status(200).json({ message: "Email verified successfully!" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}

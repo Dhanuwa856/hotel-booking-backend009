@@ -9,11 +9,13 @@ import {
   getUsers,
   loginUser,
   updateUser,
+  verifyEmail,
 } from "../Controllers/userController.js";
 
 const userRouter = express.Router();
 
 userRouter.post("/", createUser);
+userRouter.post("/verify-email", verifyEmail);
 userRouter.get("/", checkLoggedIn, checkAdmin, getUsers);
 userRouter.get("/stats", checkLoggedIn, checkAdmin, getAdminStats);
 userRouter.post("/login", loginUser);
