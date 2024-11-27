@@ -22,8 +22,30 @@ export const createRoom = async (req, res) => {
 // Get all rooms (Public access)
 export const getAllRooms = async (req, res) => {
   try {
-    const rooms = await Room.find();
-    res.status(200).json(rooms);
+    // Get page and pageSize from query parameters with default values
+    const { page = 1, pageSize = 6 } = req.query;
+
+    // Ensure page and pageSize are numbers
+    const parsedPage = Math.max(1, parseInt(page, 10));
+    const parsedPageSize = Math.max(1, parseInt(pageSize, 10));
+
+    // Calculate the number of documents to skip
+    const skip = (parsedPage - 1) * parsedPageSize;
+
+    // Fetch paginated rooms and total count
+    const rooms = await Room.find().skip(skip).limit(parsedPageSize);
+
+    const totalRooms = await Room.countDocuments();
+    const totalPages = Math.ceil(totalRooms / parsedPageSize);
+
+    // Return the paginated data and metadata
+    res.status(200).json({
+      rooms,
+      totalRooms,
+      totalPages,
+      currentPage: parsedPage,
+      pageSize: parsedPageSize,
+    });
   } catch (err) {
     res
       .status(500)

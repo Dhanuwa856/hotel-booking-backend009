@@ -22,7 +22,7 @@ bookingRouter.post(
   checkLoggedIn,
   checkCustomer,
   verifyUserStatus,
-  // checkEmailVerified,
+  checkEmailVerified,
   createBooking
 );
 bookingRouter.get("/", checkLoggedIn, checkCustomer, getBookingsByEmail);
@@ -32,7 +32,7 @@ bookingRouter.put(
   checkLoggedIn,
   checkCustomer,
   verifyUserStatus,
-  // checkEmailVerified,
+  checkEmailVerified,
   cancelBooking
 );
 bookingRouter.put(
@@ -46,6 +46,7 @@ bookingRouter.post(
   checkLoggedIn,
   checkCustomer,
   verifyUserStatus,
+  checkEmailVerified,
   createBookingUsingCategory
 );
 

@@ -14,6 +14,12 @@ export const createBooking = async (req, res) => {
   const { room_id, checkInDate, checkOutDate, guests, reason, notes } =
     req.body;
 
+  if (checkInDate >= checkOutDate) {
+    return res
+      .status(400)
+      .json({ message: "Check-out date must be after check-in date." });
+  }
+
   try {
     // Validate if room exists
     const room = await Room.findOne({ roomNumber: room_id });
@@ -90,21 +96,47 @@ export const createBooking = async (req, res) => {
 export const getBookingsByEmail = async (req, res) => {
   const user = req.user;
 
-  try {
-    // Find all bookings related to the user's email
-    const bookings = await Booking.find({ email: user.email });
+  // Extract query parameters
+  const page = parseInt(req.query.page, 10) || 1; // Default to page 1
+  const pageSize = parseInt(req.query.pageSize, 10) || 10; // Default to 10 items per page
+  const status = req.query.status || null; // Optional status filter
 
-    // Check if the user has any bookings
-    if (bookings.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No bookings found for this email." });
+  try {
+    // Build the query object
+    const query = { email: user.email };
+    if (status) {
+      query.status = status; // Add status filter if provided
     }
 
-    // Respond with the list of bookings
+    // Count the total number of bookings matching the query
+    const totalBookings = await Booking.countDocuments(query);
+
+    // Calculate the total number of pages
+    const totalPages = Math.ceil(totalBookings / pageSize);
+
+    // Fetch paginated bookings, sorted by timeStamp in descending order
+    const bookings = await Booking.find(query)
+      .sort({ timeStamp: -1 }) // Sort by timeStamp in descending order
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    // Check if bookings exist
+    if (bookings.length === 0) {
+      return res.status(404).json({
+        message: "No bookings found for the given criteria.",
+      });
+    }
+
+    // Respond with the bookings and pagination metadata
     res.status(200).json({
       message: "Bookings retrieved successfully",
       bookings,
+      pagination: {
+        totalBookings,
+        totalPages,
+        currentPage: page,
+        pageSize,
+      },
     });
   } catch (error) {
     console.error("Error retrieving bookings:", error); // Log error for debugging
