@@ -18,11 +18,11 @@ feedbackRouter.post(
   "/",
   checkLoggedIn,
   checkCustomer,
-  checkEmailVerified,
+  // checkEmailVerified,
   createFeedback
 );
 feedbackRouter.get("/", checkLoggedIn, checkCustomer, getFeedbackByUser);
-feedbackRouter.get("/all", checkLoggedIn, checkAdmin, getAllFeedback); // real code
+feedbackRouter.get("/all", getAllFeedback);
 feedbackRouter.put(
   "/:feedback_id",
   checkLoggedIn,
