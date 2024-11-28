@@ -18,7 +18,7 @@ feedbackRouter.post(
   "/",
   checkLoggedIn,
   checkCustomer,
-  // checkEmailVerified,
+  checkEmailVerified,
   createFeedback
 );
 feedbackRouter.get("/", checkLoggedIn, checkCustomer, getFeedbackByUser);
