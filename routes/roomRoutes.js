@@ -7,6 +7,7 @@ import {
   updateRoom,
 } from "../Controllers/roomController.js";
 import { checkAdmin, checkLoggedIn } from "../Controllers/userController.js";
+import { get } from "mongoose";
 
 const roomRouter = express.Router();
 
