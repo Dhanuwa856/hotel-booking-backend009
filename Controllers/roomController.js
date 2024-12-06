@@ -22,8 +22,8 @@ export const createRoom = async (req, res) => {
 // Get all rooms (Public access)
 export const getAllRooms = async (req, res) => {
   try {
-    // Get page and pageSize from query parameters with default values
-    const { page = 1, pageSize = 6 } = req.query;
+    // Get page, pageSize, and category from query parameters with default values
+    const { page = 1, pageSize = 6, category = "All" } = req.query;
 
     // Ensure page and pageSize are numbers
     const parsedPage = Math.max(1, parseInt(page, 10));
@@ -32,10 +32,13 @@ export const getAllRooms = async (req, res) => {
     // Calculate the number of documents to skip
     const skip = (parsedPage - 1) * parsedPageSize;
 
-    // Fetch paginated rooms and total count
-    const rooms = await Room.find().skip(skip).limit(parsedPageSize);
+    // Build the query object
+    const query = category === "All" ? {} : { category };
 
-    const totalRooms = await Room.countDocuments();
+    // Fetch paginated rooms based on the query and total count
+    const rooms = await Room.find(query).skip(skip).limit(parsedPageSize);
+
+    const totalRooms = await Room.countDocuments(query);
     const totalPages = Math.ceil(totalRooms / parsedPageSize);
 
     // Return the paginated data and metadata

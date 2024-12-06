@@ -128,7 +128,7 @@ export async function loginUser(req, res) {
     };
 
     // Generate JWT token
-    const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "48h" });
+    const token = jwt.sign(payload, process.env.JWT_KEY);
 
     // Respond with user data and token
     res.json({
